@@ -98,14 +98,14 @@ DisablePatchGuard(
 	UINT8* StartVa = ImageBase + StartRva;
 
 	// Search for KeInitAmd64SpecificState
-	PRINT_KERNEL_PATCH_MSG(L"\r\n== Searching for nt!KeInitAmd64SpecificState pattern in INIT ==\r\n");
+	// PRINT_KERNEL_PATCH_MSG(L"\r\n== Searching for nt!KeInitAmd64SpecificState pattern in INIT ==\r\n");
 	UINT8* KeInitAmd64SpecificStatePatternAddress = NULL;
 	for (UINT8* Address = StartVa; Address < StartVa + SizeOfRawData - sizeof(SigKeInitAmd64SpecificState); ++Address)
 	{
 		if (CompareMem(Address, SigKeInitAmd64SpecificState, sizeof(SigKeInitAmd64SpecificState)) == 0)
 		{
 			KeInitAmd64SpecificStatePatternAddress = Address;
-			PRINT_KERNEL_PATCH_MSG(L"    Found KeInitAmd64SpecificState pattern at 0x%llX.\r\n", (UINTN)KeInitAmd64SpecificStatePatternAddress);
+			// PRINT_KERNEL_PATCH_MSG(L"    Found KeInitAmd64SpecificState pattern at 0x%llX.\r\n", (UINTN)KeInitAmd64SpecificStatePatternAddress);
 			break;
 		}
 	}
@@ -123,7 +123,7 @@ DisablePatchGuard(
 	// Most variables below use the 'CcInitializeBcbProfiler' name, which is not really accurate for Windows Vista/7 but close enough.
 	// For debug prints, call the function "<HUGEFUNC>" instead if we're on Windows Vista/7. (seriously, it's fucking huge)
 	CONST CHAR16* FuncName = BuildNumber >= 9200 ? L"CcInitializeBcbProfiler" : L"<HUGEFUNC>";
-	PRINT_KERNEL_PATCH_MSG(L"== Disassembling INIT to find nt!%S ==\r\n", FuncName);
+	// PRINT_KERNEL_PATCH_MSG(L"== Disassembling INIT to find nt!%S ==\r\n", FuncName);
 	UINT8* CcInitializeBcbProfilerPatternAddress = NULL;
 
 	// On Windows Vista/7 we need to find the address of RtlPcToFileHeader, which will help identify HUGEFUNC as no other function calls this
@@ -177,7 +177,7 @@ DisablePatchGuard(
 					OperandAddress == RtlPcToFileHeader)
 				{
 					CcInitializeBcbProfilerPatternAddress = (UINT8*)Context.InstructionAddress;
-					PRINT_KERNEL_PATCH_MSG(L"    Found 'call RtlPcToFileHeader' at 0x%llX.\r\n", (UINTN)CcInitializeBcbProfilerPatternAddress);
+					// PRINT_KERNEL_PATCH_MSG(L"    Found 'call RtlPcToFileHeader' at 0x%llX.\r\n", (UINTN)CcInitializeBcbProfilerPatternAddress);
 					break;
 				}
 			}
@@ -192,7 +192,7 @@ DisablePatchGuard(
 					Context.Operands[1].imm.value.u == 0x0FFFFF780000002D4ULL)))
 			{
 				CcInitializeBcbProfilerPatternAddress = (UINT8*)Context.InstructionAddress;
-				PRINT_KERNEL_PATCH_MSG(L"    Found CcInitializeBcbProfiler pattern at 0x%llX.\r\n", (UINTN)CcInitializeBcbProfilerPatternAddress);
+				// PRINT_KERNEL_PATCH_MSG(L"    Found CcInitializeBcbProfiler pattern at 0x%llX.\r\n", (UINTN)CcInitializeBcbProfilerPatternAddress);
 				break;
 			}
 		}
@@ -213,7 +213,7 @@ DisablePatchGuard(
 	UINT8* ExpLicenseWatchInitWorker = NULL;
 	if (BuildNumber >= 9200)
 	{
-		PRINT_KERNEL_PATCH_MSG(L"== Disassembling INIT to find nt!ExpLicenseWatchInitWorker ==\r\n");
+		// PRINT_KERNEL_PATCH_MSG(L"== Disassembling INIT to find nt!ExpLicenseWatchInitWorker ==\r\n");
 		UINT8* ExpLicenseWatchInitWorkerPatternAddress = NULL;
 
 		// Start decode loop
@@ -240,7 +240,7 @@ DisablePatchGuard(
 				Context.Operands[1].mem.disp.value == 0x0FFFFF780000002D4LL)
 			{
 				ExpLicenseWatchInitWorkerPatternAddress = (UINT8*)Context.InstructionAddress;
-				PRINT_KERNEL_PATCH_MSG(L"    Found ExpLicenseWatchInitWorker pattern at 0x%llX.\r\n", (UINTN)ExpLicenseWatchInitWorkerPatternAddress);
+				// PRINT_KERNEL_PATCH_MSG(L"    Found ExpLicenseWatchInitWorker pattern at 0x%llX.\r\n", (UINTN)ExpLicenseWatchInitWorkerPatternAddress);
 				break;
 			}
 
@@ -261,7 +261,7 @@ DisablePatchGuard(
 	UINT8* KiVerifyScopesExecute = NULL;
 	if (BuildNumber >= 9600)
 	{
-		PRINT_KERNEL_PATCH_MSG(L"== Searching for nt!KiVerifyScopesExecute pattern in INIT ==\r\n");
+		// PRINT_KERNEL_PATCH_MSG(L"== Searching for nt!KiVerifyScopesExecute pattern in INIT ==\r\n");
 		UINT8* KiVerifyScopesExecutePatternAddress = NULL;
 		CONST EFI_STATUS FindKiVerifyScopesExecuteStatus = FindPattern(SigKiVerifyScopesExecute,
 																	0xCC,
@@ -274,7 +274,7 @@ DisablePatchGuard(
 			PRINT_KERNEL_PATCH_MSG(L"    Failed to find KiVerifyScopesExecute pattern.\r\n");
 			return EFI_NOT_FOUND;
 		}
-		PRINT_KERNEL_PATCH_MSG(L"    Found KiVerifyScopesExecute pattern at 0x%llX.\r\n", (UINTN)KiVerifyScopesExecutePatternAddress);
+		// PRINT_KERNEL_PATCH_MSG(L"    Found KiVerifyScopesExecute pattern at 0x%llX.\r\n", (UINTN)KiVerifyScopesExecutePatternAddress);
 
 		// Backtrack to function start
 		KiVerifyScopesExecute = BacktrackToFunctionStart(ImageBase, NtHeaders, KiVerifyScopesExecutePatternAddress);
@@ -295,14 +295,14 @@ DisablePatchGuard(
 		StartVa = ImageBase + StartRva;
 
 		// Search for KiMcaDeferredRecoveryService
-		PRINT_KERNEL_PATCH_MSG(L"== Searching for nt!KiMcaDeferredRecoveryService pattern in .text ==\r\n");
+		// PRINT_KERNEL_PATCH_MSG(L"== Searching for nt!KiMcaDeferredRecoveryService pattern in .text ==\r\n");
 		UINT8* KiMcaDeferredRecoveryService = NULL;
 		for (UINT8* Address = StartVa; Address < StartVa + SizeOfRawData - sizeof(SigKiMcaDeferredRecoveryService); ++Address)
 		{
 			if (CompareMem(Address, SigKiMcaDeferredRecoveryService, sizeof(SigKiMcaDeferredRecoveryService)) == 0)
 			{
 				KiMcaDeferredRecoveryService = Address;
-				PRINT_KERNEL_PATCH_MSG(L"    Found KiMcaDeferredRecoveryService pattern at 0x%llX.\r\n", (UINTN)KiMcaDeferredRecoveryService);
+				// PRINT_KERNEL_PATCH_MSG(L"    Found KiMcaDeferredRecoveryService pattern at 0x%llX.\r\n", (UINTN)KiMcaDeferredRecoveryService);
 				break;
 			}
 		}
@@ -371,7 +371,7 @@ DisablePatchGuard(
 		SizeOfRawData = TextSection->SizeOfRawData;
 		StartVa = ImageBase + StartRva;
 
-		PRINT_KERNEL_PATCH_MSG(L"== Searching for nt!KiSwInterrupt pattern in .text ==\r\n");
+		// PRINT_KERNEL_PATCH_MSG(L"== Searching for nt!KiSwInterrupt pattern in .text ==\r\n");
 		UINT8* KiSwInterruptDispatchAddress = NULL;
 		CONST EFI_STATUS FindKiSwInterruptStatus = FindPattern(SigKiSwInterrupt,
 																0xCC,
@@ -391,7 +391,7 @@ DisablePatchGuard(
 			CONST INT32 Relative = *(INT32*)(KiSwInterruptPatternAddress + SigKiSwInterruptCallOffset + 1);
 			KiSwInterruptDispatchAddress = KiSwInterruptPatternAddress + SigKiSwInterruptCliOffset + Relative;
 			
-			PRINT_KERNEL_PATCH_MSG(L"    Found KiSwInterrupt pattern at 0x%llX.\r\n", (UINTN)KiSwInterruptPatternAddress);
+			// PRINT_KERNEL_PATCH_MSG(L"    Found KiSwInterrupt pattern at 0x%llX.\r\n", (UINTN)KiSwInterruptPatternAddress);
 		}
 
 		if (KiSwInterruptDispatchAddress != NULL && FindGlobalPgContext)
@@ -422,7 +422,7 @@ DisablePatchGuard(
 				{
 					if (ZYAN_SUCCESS(ZydisCalcAbsoluteAddress(&Context.Instruction, &Context.Operands[1], Context.InstructionAddress, (ZyanU64*)&gPgContext)))
 					{
-						PRINT_KERNEL_PATCH_MSG(L"    Found g_PgContext at 0x%llX.\r\n", (UINTN)gPgContext);
+						// PRINT_KERNEL_PATCH_MSG(L"    Found g_PgContext at 0x%llX.\r\n", (UINTN)gPgContext);
 						break;
 					}
 				}
@@ -457,35 +457,35 @@ DisablePatchGuard(
 	}
 
 	// Print info
-	PRINT_KERNEL_PATCH_MSG(L"\r\n    Patched KeInitAmd64SpecificState [RVA: 0x%X].\r\n",
-		(UINT32)(KeInitAmd64SpecificState - ImageBase));
-	PRINT_KERNEL_PATCH_MSG(L"    Patched %ls [RVA: 0x%X].\r\n",
-		FuncName, (UINT32)(CcInitializeBcbProfiler - ImageBase));
+	// PRINT_KERNEL_PATCH_MSG(L"\r\n    Patched KeInitAmd64SpecificState [RVA: 0x%X].\r\n",
+	// 	(UINT32)(KeInitAmd64SpecificState - ImageBase));
+	// PRINT_KERNEL_PATCH_MSG(L"    Patched %ls [RVA: 0x%X].\r\n",
+	// 	FuncName, (UINT32)(CcInitializeBcbProfiler - ImageBase));
 	if (ExpLicenseWatchInitWorker != NULL)
 	{
-		PRINT_KERNEL_PATCH_MSG(L"    Patched ExpLicenseWatchInitWorker [RVA: 0x%X].\r\n",
-			(UINT32)(ExpLicenseWatchInitWorker - ImageBase));
+		// PRINT_KERNEL_PATCH_MSG(L"    Patched ExpLicenseWatchInitWorker [RVA: 0x%X].\r\n",
+		// 	(UINT32)(ExpLicenseWatchInitWorker - ImageBase));
 	}
 	if (KiVerifyScopesExecute != NULL)
 	{
-		PRINT_KERNEL_PATCH_MSG(L"    Patched KiVerifyScopesExecute [RVA: 0x%X].\r\n",
-			(UINT32)(KiVerifyScopesExecute - ImageBase));
+		// PRINT_KERNEL_PATCH_MSG(L"    Patched KiVerifyScopesExecute [RVA: 0x%X].\r\n",
+		// 	(UINT32)(KiVerifyScopesExecute - ImageBase));
 	}
 	if (KiMcaDeferredRecoveryServiceCallers[0] != NULL && KiMcaDeferredRecoveryServiceCallers[1] != NULL)
 	{
-		PRINT_KERNEL_PATCH_MSG(L"    Patched KiMcaDeferredRecoveryService [RVAs: 0x%X, 0x%X].\r\n",
-			(UINT32)(KiMcaDeferredRecoveryServiceCallers[0] - ImageBase),
-			(UINT32)(KiMcaDeferredRecoveryServiceCallers[1] - ImageBase));
+		// PRINT_KERNEL_PATCH_MSG(L"    Patched KiMcaDeferredRecoveryService [RVAs: 0x%X, 0x%X].\r\n",
+		// 	(UINT32)(KiMcaDeferredRecoveryServiceCallers[0] - ImageBase),
+		// 	(UINT32)(KiMcaDeferredRecoveryServiceCallers[1] - ImageBase));
 	}
 	if (gPgContext != NULL)
 	{
-		PRINT_KERNEL_PATCH_MSG(L"    Patched g_PgContext [RVA: 0x%X].\r\n",
-			(UINT32)(gPgContext - ImageBase));
+		// PRINT_KERNEL_PATCH_MSG(L"    Patched g_PgContext [RVA: 0x%X].\r\n",
+		// 	(UINT32)(gPgContext - ImageBase));
 	}
 	else if (KiSwInterruptPatternAddress != NULL)
 	{
-		PRINT_KERNEL_PATCH_MSG(L"    Patched KiSwInterrupt [RVA: 0x%X].\r\n",
-			(UINT32)(KiSwInterruptPatternAddress - ImageBase));
+		// PRINT_KERNEL_PATCH_MSG(L"    Patched KiSwInterrupt [RVA: 0x%X].\r\n",
+		// 	(UINT32)(KiSwInterruptPatternAddress - ImageBase));
 	}
 
 	return EFI_SUCCESS;
@@ -528,7 +528,7 @@ DisableDSE(
 		return IatStatus;
 	}
 
-	PRINT_KERNEL_PATCH_MSG(L"\r\n== Disassembling PAGE to find nt!SepInitializeCodeIntegrity 'mov ecx, xxx' ==\r\n");
+	// PRINT_KERNEL_PATCH_MSG(L"\r\n== Disassembling PAGE to find nt!SepInitializeCodeIntegrity 'mov ecx, xxx' ==\r\n");
 
 	// Initialize Zydis
 	ZYDIS_CONTEXT Context;
@@ -637,8 +637,8 @@ DisableDSE(
 				OperandAddress == (UINTN)CiInitialize)
 			{
 				SepInitializeCodeIntegrityMovEcxAddress = LastMovIntoEcx; // The last 'mov ecx, xxx' before the call/jmp is the instruction we want
-				PRINT_KERNEL_PATCH_MSG(L"    Found 'mov ecx, xxx' in SepInitializeCodeIntegrity [RVA: 0x%X].\r\n",
-					(UINT32)(SepInitializeCodeIntegrityMovEcxAddress - ImageBase));
+				// PRINT_KERNEL_PATCH_MSG(L"    Found 'mov ecx, xxx' in SepInitializeCodeIntegrity [RVA: 0x%X].\r\n",
+				// 	(UINT32)(SepInitializeCodeIntegrityMovEcxAddress - ImageBase));
 				break;
 			}
 		}
@@ -680,7 +680,7 @@ DisableDSE(
 			{
 				if (ZYAN_SUCCESS(ZydisCalcAbsoluteAddress(&Context.Instruction, &Context.Operands[0], Context.InstructionAddress, &gCiEnabled)))
 				{
-					PRINT_KERNEL_PATCH_MSG(L"    Found g_CiEnabled at 0x%llX.\r\n", gCiEnabled);
+					// PRINT_KERNEL_PATCH_MSG(L"    Found g_CiEnabled at 0x%llX.\r\n", gCiEnabled);
 					break;
 				}
 			}
@@ -695,8 +695,8 @@ DisableDSE(
 		}
 	}
 
-	PRINT_KERNEL_PATCH_MSG(L"== Disassembling PAGE to find nt!SeValidateImageData '%S' ==\r\n",
-		(BuildNumber >= 9200 ? L"mov eax, 0xC0000428" : L"cmp g_CiEnabled, al"));
+	// PRINT_KERNEL_PATCH_MSG(L"== Disassembling PAGE to find nt!SeValidateImageData '%S' ==\r\n",
+	// 	(BuildNumber >= 9200 ? L"mov eax, 0xC0000428" : L"cmp g_CiEnabled, al"));
 	UINT8 *SeValidateImageDataMovEaxAddress = NULL, *SeValidateImageDataJzAddress = NULL;
 
 	// Start decode loop
@@ -727,8 +727,8 @@ DisableDSE(
 			if (*(Address + Context.Instruction.length) == JmpOpcode || *(Address + Context.Instruction.length) == 0xC3)
 			{
 				SeValidateImageDataMovEaxAddress = (UINT8*)Address;
-				PRINT_KERNEL_PATCH_MSG(L"    Found 'mov eax, 0xC0000428' in SeValidateImageData [RVA: 0x%X].\r\n",
-					(UINT32)(SeValidateImageDataMovEaxAddress - ImageBase));
+				// PRINT_KERNEL_PATCH_MSG(L"    Found 'mov eax, 0xC0000428' in SeValidateImageData [RVA: 0x%X].\r\n",
+				// 	(UINT32)(SeValidateImageDataMovEaxAddress - ImageBase));
 				break;
 			}
 		}
@@ -747,8 +747,8 @@ DisableDSE(
 				if (*(Address + Context.Instruction.length) == 0x74)
 				{
 					SeValidateImageDataJzAddress = (UINT8*)(Address + Context.Instruction.length);
-					PRINT_KERNEL_PATCH_MSG(L"    Found 'cmp g_CiEnabled, al' in SeValidateImageData [RVA: 0x%X].\r\n",
-						(UINT32)(Address - ImageBase));
+					// PRINT_KERNEL_PATCH_MSG(L"    Found 'cmp g_CiEnabled, al' in SeValidateImageData [RVA: 0x%X].\r\n",
+					// 	(UINT32)(Address - ImageBase));
 					break;
 				}
 			}
@@ -800,7 +800,7 @@ DisableDSE(
 		else
 		{
 			CopyMem(Found, SeCodeIntegrityQueryInformationPatch, sizeof(SeCodeIntegrityQueryInformationPatch));
-			PRINT_KERNEL_PATCH_MSG(L"\r\nPatched SeCodeIntegrityQueryInformation [RVA: 0x%X].\r\n", (UINT32)(Found - ImageBase));
+			// PRINT_KERNEL_PATCH_MSG(L"\r\nPatched SeCodeIntegrityQueryInformation [RVA: 0x%X].\r\n", (UINT32)(Found - ImageBase));
 		}
 	}
 
@@ -817,7 +817,7 @@ PatchNtoskrnl(
 	IN PEFI_IMAGE_NT_HEADERS NtHeaders
 	)
 {
-	PRINT_KERNEL_PATCH_MSG(L"[PatchNtoskrnl] ntoskrnl.exe at 0x%llX, size 0x%llX\r\n", (UINTN)ImageBase, (UINTN)NtHeaders->OptionalHeader.SizeOfImage);
+	// PRINT_KERNEL_PATCH_MSG(L"[PatchNtoskrnl] ntoskrnl.exe at 0x%llX, size 0x%llX\r\n", (UINTN)ImageBase, (UINTN)NtHeaders->OptionalHeader.SizeOfImage);
 
 	// Print file and version info
 	UINT16 MajorVersion = 0, MinorVersion = 0, BuildNumber = 0, Revision = 0;
@@ -829,7 +829,7 @@ PatchNtoskrnl(
 	}
 	else
 	{
-		PRINT_KERNEL_PATCH_MSG(L"[PatchNtoskrnl] Patching ntoskrnl.exe v%u.%u.%u.%u...\r\n", MajorVersion, MinorVersion, BuildNumber, Revision);
+		// PRINT_KERNEL_PATCH_MSG(L"[PatchNtoskrnl] Patching ntoskrnl.exe v%u.%u.%u.%u...\r\n", MajorVersion, MinorVersion, BuildNumber, Revision);
 		gKernelPatchInfo.KernelBuildNumber = BuildNumber;
 
 		// Check if this is a supported kernel version. All versions after Vista SP1 should be supported.
@@ -872,8 +872,8 @@ PatchNtoskrnl(
 	ASSERT(InitSection != NULL && TextSection != NULL && PageSection != NULL);
 
 	// Patch INIT and .text sections to disable PatchGuard
-	PRINT_KERNEL_PATCH_MSG(L"[PatchNtoskrnl] Disabling PatchGuard... [INIT RVA: 0x%X - 0x%X]\r\n",
-		InitSection->VirtualAddress, InitSection->VirtualAddress + InitSection->SizeOfRawData);
+	// PRINT_KERNEL_PATCH_MSG(L"[PatchNtoskrnl] Disabling PatchGuard... [INIT RVA: 0x%X - 0x%X]\r\n",
+	// 	InitSection->VirtualAddress, InitSection->VirtualAddress + InitSection->SizeOfRawData);
 	Status = DisablePatchGuard(ImageBase,
 								NtHeaders,
 								InitSection,
@@ -882,15 +882,15 @@ PatchNtoskrnl(
 	if (EFI_ERROR(Status))
 		return Status;
 
-	PRINT_KERNEL_PATCH_MSG(L"\r\n[PatchNtoskrnl] Successfully disabled PatchGuard.\r\n");
+	// PRINT_KERNEL_PATCH_MSG(L"\r\n[PatchNtoskrnl] Successfully disabled PatchGuard.\r\n");
 
 	if (gDriverConfig.DseBypassMethod == DSE_DISABLE_AT_BOOT ||
 		(BuildNumber < 9200 && gDriverConfig.DseBypassMethod != DSE_DISABLE_NONE))
 	{
 		// Patch PAGE section to disable DSE at boot, or (on Windows Vista/7) to allow the SetVariable hook to be safely used more than once
-		PRINT_KERNEL_PATCH_MSG(L"[PatchNtoskrnl] %S... [PAGE RVA: 0x%X - 0x%X]\r\n",
-			gDriverConfig.DseBypassMethod == DSE_DISABLE_AT_BOOT ? L"Disabling DSE" : L"Ensuring safe DSE bypass",
-			PageSection->VirtualAddress, PageSection->VirtualAddress + PageSection->SizeOfRawData);
+		// PRINT_KERNEL_PATCH_MSG(L"[PatchNtoskrnl] %S... [PAGE RVA: 0x%X - 0x%X]\r\n",
+		// 	gDriverConfig.DseBypassMethod == DSE_DISABLE_AT_BOOT ? L"Disabling DSE" : L"Ensuring safe DSE bypass",
+		// 	PageSection->VirtualAddress, PageSection->VirtualAddress + PageSection->SizeOfRawData);
 		Status = DisableDSE(ImageBase,
 							NtHeaders,
 							PageSection,
@@ -899,8 +899,8 @@ PatchNtoskrnl(
 		if (EFI_ERROR(Status))
 			return Status;
 
-		if (gDriverConfig.DseBypassMethod == DSE_DISABLE_AT_BOOT)
-			PRINT_KERNEL_PATCH_MSG(L"\r\n[PatchNtoskrnl] Successfully disabled DSE.\r\n");
+		// if (gDriverConfig.DseBypassMethod == DSE_DISABLE_AT_BOOT)
+		// 	PRINT_KERNEL_PATCH_MSG(L"\r\n[PatchNtoskrnl] Successfully disabled DSE.\r\n");
 	}
 
 	return Status;

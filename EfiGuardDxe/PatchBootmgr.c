@@ -84,28 +84,28 @@ HookedBootManagerImgArchStartBootApplication(
 	}
 
 	// Print info
-	Print(L"[ %S!ImgArchStartBootApplication ]\r\n", (OriginalFunctionBytes == gBootmgrImgArchStartBootApplicationBackup ? L"bootmgr" : L"bootmgfw"));
-	Print(L"ImageBase: 0x%p\r\n", ImageBase);
-	Print(L"ImageSize: %lx\r\n", ImageSize);
-	Print(L"File type: %S\r\n", FileTypeToString(FileType));
-	Print(L"EntryPoint: 0x%p\r\n", ((UINT8*)ImageBase + HEADER_FIELD(NtHeaders, AddressOfEntryPoint)));
-	Print(L"AppEntry:\r\n");
-	Print(L"  Signature: %a\r\n", AppEntry->Signature);
-	Print(L"  Flags: %lx\r\n", AppEntry->Flags);
-	Print(L"  GUID: %08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x\r\n",
-		AppEntry->Guid.Data1, AppEntry->Guid.Data2, AppEntry->Guid.Data3,
-		AppEntry->Guid.Data4[0], AppEntry->Guid.Data4[1], AppEntry->Guid.Data4[2], AppEntry->Guid.Data4[3],
-		AppEntry->Guid.Data4[4], AppEntry->Guid.Data4[5], AppEntry->Guid.Data4[6], AppEntry->Guid.Data4[7]);
+	// Print(L"[ %S!ImgArchStartBootApplication ]\r\n", (OriginalFunctionBytes == gBootmgrImgArchStartBootApplicationBackup ? L"bootmgr" : L"bootmgfw"));
+	// Print(L"ImageBase: 0x%p\r\n", ImageBase);
+	// Print(L"ImageSize: %lx\r\n", ImageSize);
+	// Print(L"File type: %S\r\n", FileTypeToString(FileType));
+	// Print(L"EntryPoint: 0x%p\r\n", ((UINT8*)ImageBase + HEADER_FIELD(NtHeaders, AddressOfEntryPoint)));
+	// Print(L"AppEntry:\r\n");
+	// Print(L"  Signature: %a\r\n", AppEntry->Signature);
+	// Print(L"  Flags: %lx\r\n", AppEntry->Flags);
+	// Print(L"  GUID: %08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x\r\n",
+	// 	AppEntry->Guid.Data1, AppEntry->Guid.Data2, AppEntry->Guid.Data3,
+	// 	AppEntry->Guid.Data4[0], AppEntry->Guid.Data4[1], AppEntry->Guid.Data4[2], AppEntry->Guid.Data4[3],
+	// 	AppEntry->Guid.Data4[4], AppEntry->Guid.Data4[5], AppEntry->Guid.Data4[6], AppEntry->Guid.Data4[7]);
 #ifdef EFI_DEBUG
 	// Stuff likely no one cares about
-	Print(L"  Unknown: %lx %lx %lx %lx\r\n", AppEntry->Unknown[0], AppEntry->Unknown[1], AppEntry->Unknown[2], AppEntry->Unknown[3]);
-	Print(L"  BcdData:\r\n");
-	Print(L"    Type: %lx\r\n", AppEntry->BcdData.Type);
-	Print(L"    DataOffset: %lx\r\n", AppEntry->BcdData.DataOffset);
-	Print(L"    DataSize: %lx\r\n", AppEntry->BcdData.DataSize);
-	Print(L"    ListOffset: %lx\r\n", AppEntry->BcdData.ListOffset);
-	Print(L"    NextEntryOffset: %lx\r\n", AppEntry->BcdData.NextEntryOffset);
-	Print(L"    Empty: %lx\r\n", AppEntry->BcdData.Empty);
+	// Print(L"  Unknown: %lx %lx %lx %lx\r\n", AppEntry->Unknown[0], AppEntry->Unknown[1], AppEntry->Unknown[2], AppEntry->Unknown[3]);
+	// Print(L"  BcdData:\r\n");
+	// Print(L"    Type: %lx\r\n", AppEntry->BcdData.Type);
+	// Print(L"    DataOffset: %lx\r\n", AppEntry->BcdData.DataOffset);
+	// Print(L"    DataSize: %lx\r\n", AppEntry->BcdData.DataSize);
+	// Print(L"    ListOffset: %lx\r\n", AppEntry->BcdData.ListOffset);
+	// Print(L"    NextEntryOffset: %lx\r\n", AppEntry->BcdData.NextEntryOffset);
+	// Print(L"    Empty: %lx\r\n", AppEntry->BcdData.Empty);
 #endif
 
 	if (FileType == WinloadEfi)
@@ -272,7 +272,7 @@ PatchBootManager(
 		Print(L"\r\nPatchBootManager: WARNING: failed to obtain %S.efi version info. Status: %llx\r\n", ShortFileName, Status);
 	else
 	{
-		Print(L"\r\nPatching %S.efi v%u.%u.%u.%u...\r\n", ShortFileName, MajorVersion, MinorVersion, BuildNumber, Revision);
+		// Print(L"\r\nPatching %S.efi v%u.%u.%u.%u...\r\n", ShortFileName, MajorVersion, MinorVersion, BuildNumber, Revision);
 
 		// Check if this is a supported boot manager version. All patches should work on all versions since Vista SP1,
 		// except for the ImgpFilterValidationFailure patch because this function only exists on Windows 7 and higher.
@@ -321,8 +321,8 @@ PatchBootManager(
 	else
 		HookAddress = PatchingBootmgrEfi ? (VOID*)&HookedBootmgrImgArchStartBootApplication_Eight : (VOID*)&HookedBootmgfwImgArchStartBootApplication_Eight;
 	UINT8* BackupAddress = PatchingBootmgrEfi ? gBootmgrImgArchStartBootApplicationBackup : gBootmgfwImgArchStartBootApplicationBackup;
-	Print(L"\r\nFound %S!%S at 0x%p.\r\n", ShortFileName, FunctionName, (VOID*)OriginalAddress);
-	Print(L"Hooked%S%S at 0x%p.\r\n", (PatchingBootmgrEfi ? L"Bootmgr" : L"Bootmgfw"), FunctionName, HookAddress);
+	// Print(L"\r\nFound %S!%S at 0x%p.\r\n", ShortFileName, FunctionName, (VOID*)OriginalAddress);
+	// Print(L"Hooked%S%S at 0x%p.\r\n", (PatchingBootmgrEfi ? L"Bootmgr" : L"Bootmgfw"), FunctionName, HookAddress);
 
 	CONST EFI_TPL Tpl = gBS->RaiseTPL(TPL_HIGH_LEVEL); // Note: implies cli
 
@@ -362,8 +362,8 @@ Exit:
 	}
 	else
 	{
-		Print(L"Successfully patched %S!%S.\r\n", ShortFileName, FunctionName);
-		RtlSleep(2000);
+		// Print(L"Successfully patched %S!%S.\r\n", ShortFileName, FunctionName);
+		// RtlSleep(2000);
 
 		if (gDriverConfig.WaitForKeyPress)
 		{

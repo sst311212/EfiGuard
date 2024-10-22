@@ -191,7 +191,7 @@ PatchImgpValidateImageHash(
 	CONST UINT32 CodeSizeOfRawData = CodeSection->SizeOfRawData;
 	CONST UINT8* CodeStartVa = ImageBase + CodeSection->VirtualAddress;
 
-	Print(L"== Disassembling .text to find %S!ImgpValidateImageHash ==\r\n", ShortName);
+	// Print(L"== Disassembling .text to find %S!ImgpValidateImageHash ==\r\n", ShortName);
 	UINT8* AndMinusFortyOneAddress = NULL;
 
 	// Initialize Zydis
@@ -250,8 +250,8 @@ PatchImgpValidateImageHash(
 	CopyWpMem(ImgpValidateImageHash, &Ok, sizeof(Ok));
 
 	// Print info
-	Print(L"    Patched %S!ImgpValidateImageHash [RVA: 0x%X].\r\n",
-		ShortName, (UINT32)(ImgpValidateImageHash - ImageBase));
+	// Print(L"    Patched %S!ImgpValidateImageHash [RVA: 0x%X].\r\n",
+	// 	ShortName, (UINT32)(ImgpValidateImageHash - ImageBase));
 
 	return EFI_SUCCESS;
 }
@@ -292,14 +292,14 @@ PatchImgpFilterValidationFailure(
 	ASSERT(CodeSection != NULL);
 
 	CONST UINT32 PatternStartRva = PatternSection->VirtualAddress;
-	CONST UINT32 PatternSizeOfRawData = PatternSection->SizeOfRawData;
+	// CONST UINT32 PatternSizeOfRawData = PatternSection->SizeOfRawData;
 	CONST UINT8* PatternStartVa = ImageBase + PatternStartRva;
 
 	CHAR8 SectionName[EFI_IMAGE_SIZEOF_SHORT_NAME + 1];
 	CopyMem(SectionName, PatternSection->Name, EFI_IMAGE_SIZEOF_SHORT_NAME);
 	SectionName[EFI_IMAGE_SIZEOF_SHORT_NAME] = '\0';
-	Print(L"\r\n== Searching for load failure string in %a [RVA: 0x%X - 0x%X] ==\r\n",
-		SectionName, PatternStartRva, PatternStartRva + PatternSizeOfRawData);
+	// Print(L"\r\n== Searching for load failure string in %a [RVA: 0x%X - 0x%X] ==\r\n",
+	// 	SectionName, PatternStartRva, PatternStartRva + PatternSizeOfRawData);
 
 	// Search for the black screen of death string "Windows is unable to verify the integrity of the file [...]"
 	UINT8* IntegrityFailureStringAddress = NULL;
@@ -310,7 +310,7 @@ PatchImgpFilterValidationFailure(
 		if (CompareMem(Address, ImgpFilterValidationFailureMessage.Buffer, ImgpFilterValidationFailureMessage.Length) == 0)
 		{
 			IntegrityFailureStringAddress = Address;
-			Print(L"    Found load failure string at 0x%llx.\r\n", (UINTN)IntegrityFailureStringAddress);
+			// Print(L"    Found load failure string at 0x%llx.\r\n", (UINTN)IntegrityFailureStringAddress);
 			break;
 		}
 	}
@@ -327,7 +327,7 @@ PatchImgpFilterValidationFailure(
 
 	ZeroMem(SectionName, sizeof(SectionName));
 	CopyMem(SectionName, CodeSection->Name, EFI_IMAGE_SIZEOF_SHORT_NAME);
-	Print(L"== Disassembling %a to find %S!ImgpFilterValidationFailure ==\r\n", SectionName, ShortName);
+	// Print(L"== Disassembling %a to find %S!ImgpFilterValidationFailure ==\r\n", SectionName, ShortName);
 	UINT8* LeaIntegrityFailureAddress = NULL;
 
 	// Initialize Zydis
@@ -366,7 +366,7 @@ PatchImgpFilterValidationFailure(
 				OperandAddress == (UINTN)IntegrityFailureStringAddress)
 			{
 				LeaIntegrityFailureAddress = (UINT8*)Context.InstructionAddress;
-				Print(L"    Found load instruction for load failure string at 0x%llx.\r\n", (UINTN)LeaIntegrityFailureAddress);
+				// Print(L"    Found load instruction for load failure string at 0x%llx.\r\n", (UINTN)LeaIntegrityFailureAddress);
 				break;
 			}
 		}
@@ -388,8 +388,8 @@ PatchImgpFilterValidationFailure(
 	CopyWpMem(ImgpFilterValidationFailure, &Ok, sizeof(Ok));
 
 	// Print info
-	Print(L"    Patched %S!ImgpFilterValidationFailure [RVA: 0x%X].\r\n\r\n",
-		ShortName, (UINT32)(ImgpFilterValidationFailure - ImageBase));
+	// Print(L"    Patched %S!ImgpFilterValidationFailure [RVA: 0x%X].\r\n\r\n",
+	// 	ShortName, (UINT32)(ImgpFilterValidationFailure - ImageBase));
 
 	return EFI_SUCCESS;
 }
@@ -430,14 +430,14 @@ FindOslFwpKernelSetupPhase1(
 			*OslFwpKernelSetupPhase1Address = BacktrackToFunctionStart(ImageBase, NtHeaders, Found);
 			if (*OslFwpKernelSetupPhase1Address != NULL)
 			{
-				Print(L"\r\nFound OslFwpKernelSetupPhase1 at 0x%llX.\r\n", (UINTN)(*OslFwpKernelSetupPhase1Address));
+				// Print(L"\r\nFound OslFwpKernelSetupPhase1 at 0x%llX.\r\n", (UINTN)(*OslFwpKernelSetupPhase1Address));
 				return EFI_SUCCESS; // Found; early out
 			}
 		}
 	}
 
 	// Initialize Zydis
-	Print(L"\r\n== Disassembling .text to find OslFwpKernelSetupPhase1 ==\r\n");
+	// Print(L"\r\n== Disassembling .text to find OslFwpKernelSetupPhase1 ==\r\n");
 	ZYDIS_CONTEXT Context;
 	ZyanStatus Status = ZydisInit(NtHeaders, &Context);
 	if (!ZYAN_SUCCESS(Status))
@@ -481,7 +481,7 @@ FindOslFwpKernelSetupPhase1(
 						*(UINT32*)(&CallBlBdStopAddress[-4]) == 0x124 &&
 						(*OslFwpKernelSetupPhase1Address = BacktrackToFunctionStart(ImageBase, NtHeaders, CallBlBdStopAddress)) != NULL)
 					{
-						Print(L"    Found OslFwpKernelSetupPhase1 at 0x%llX.\r\n\r\n", (UINTN)(*OslFwpKernelSetupPhase1Address));
+						// Print(L"    Found OslFwpKernelSetupPhase1 at 0x%llX.\r\n\r\n", (UINTN)(*OslFwpKernelSetupPhase1Address));
 						return EFI_SUCCESS;
 					}
 				}
@@ -498,7 +498,7 @@ FindOslFwpKernelSetupPhase1(
 	// This of course implies finding EfipGetRsdt first. After that, find all calls to this function, and for each, calculate
 	// the distance from the start of the function to the call. OslFwpKernelSetupPhase1 is reliably (Vista through 10)
 	// the function that has the smallest value for this distance, i.e. the call happens very early in the function.
-	Print(L"\r\n== Searching for EfipGetRsdt pattern in .text ==\r\n");
+	// Print(L"\r\n== Searching for EfipGetRsdt pattern in .text ==\r\n");
 
 	// Search for EFI ACPI 2.0 table GUID: { 8868e871-e4f1-11d3-bc22-0080c73c8881 }
 	UINT8* PatternAddress = NULL;
@@ -509,7 +509,7 @@ FindOslFwpKernelSetupPhase1(
 		if (CompareGuid((CONST GUID*)Address, &gEfiAcpi20TableGuid))
 		{
 			PatternAddress = Address;
-			Print(L"    Found EFI ACPI 2.0 GUID at 0x%llX.\r\n", (UINTN)PatternAddress);
+			// Print(L"    Found EFI ACPI 2.0 GUID at 0x%llX.\r\n", (UINTN)PatternAddress);
 			break;
 		}
 	}
@@ -520,7 +520,7 @@ FindOslFwpKernelSetupPhase1(
 		return EFI_NOT_FOUND;
 	}
 
-	Print(L"\r\n== Disassembling .text to find EfipGetRsdt ==\r\n");
+	// Print(L"\r\n== Disassembling .text to find EfipGetRsdt ==\r\n");
 	UINT8* LeaEfiAcpiTableGuidAddress = NULL;
 	Context.Length = CodeSizeOfRawData;
 	Context.Offset = 0;
@@ -555,7 +555,7 @@ FindOslFwpKernelSetupPhase1(
 				if (Check[0] == 0x49 && Check[1] == 0x8D && Check[2] == 0x53) // If no match, this is not EfipGetRsdt
 				{
 					LeaEfiAcpiTableGuidAddress = (UINT8*)Context.InstructionAddress;
-					Print(L"    Found load instruction for EFI ACPI 2.0 GUID at 0x%llX.\r\n", (UINTN)LeaEfiAcpiTableGuidAddress);
+					// Print(L"    Found load instruction for EFI ACPI 2.0 GUID at 0x%llX.\r\n", (UINTN)LeaEfiAcpiTableGuidAddress);
 					break;
 				}
 			}
@@ -577,7 +577,7 @@ FindOslFwpKernelSetupPhase1(
 		return EFI_NOT_FOUND;
 	}
 
-	Print(L"    Found EfipGetRsdt at 0x%llX.\r\n", (UINTN)EfipGetRsdt);
+	// Print(L"    Found EfipGetRsdt at 0x%llX.\r\n", (UINTN)EfipGetRsdt);
 	UINT8* CallEfipGetRsdtAddress = NULL;
 
 	// Start decode loop
@@ -628,7 +628,7 @@ FindOslFwpKernelSetupPhase1(
 
 	// Found
 	*OslFwpKernelSetupPhase1Address = CallEfipGetRsdtAddress - ShortestDistanceToCall;
-	Print(L"    Found OslFwpKernelSetupPhase1 at 0x%llX.\r\n\r\n", (UINTN)(*OslFwpKernelSetupPhase1Address));
+	// Print(L"    Found OslFwpKernelSetupPhase1 at 0x%llX.\r\n\r\n", (UINTN)(*OslFwpKernelSetupPhase1Address));
 
 	return EFI_SUCCESS;
 }
@@ -650,7 +650,7 @@ PatchWinload(
 		Print(L"\r\nPatchWinload: WARNING: failed to obtain winload.efi version info. Status: %llx\r\n", Status);
 	else
 	{
-		Print(L"\r\nPatching winload.efi v%u.%u.%u.%u...\r\n", MajorVersion, MinorVersion, BuildNumber, Revision);
+		// Print(L"\r\nPatching winload.efi v%u.%u.%u.%u...\r\n", MajorVersion, MinorVersion, BuildNumber, Revision);
 
 		// Some... adjustments... need to be made later on in the case of pre-Windows 7 loader blocks, so store the build number
 		gKernelPatchInfo.WinloadBuildNumber = BuildNumber;
@@ -725,7 +725,7 @@ PatchWinload(
 	}
 
 	CONST UINTN HookedOslFwpKernelSetupPhase1Address = (UINTN)&HookedOslFwpKernelSetupPhase1;
-	Print(L"HookedOslFwpKernelSetupPhase1 at 0x%p.\r\n", (VOID*)HookedOslFwpKernelSetupPhase1Address);
+	// Print(L"HookedOslFwpKernelSetupPhase1 at 0x%p.\r\n", (VOID*)HookedOslFwpKernelSetupPhase1Address);
 
 	CONST EFI_TPL Tpl = gBS->RaiseTPL(TPL_HIGH_LEVEL); // Note: implies cli
 
@@ -766,8 +766,8 @@ Exit:
 	}
 	else
 	{
-		Print(L"Successfully patched winload!OslFwpKernelSetupPhase1.\r\n");
-		RtlSleep(2000);
+		// Print(L"Successfully patched winload!OslFwpKernelSetupPhase1.\r\n");
+		// RtlSleep(2000);
 
 		if (gDriverConfig.WaitForKeyPress)
 		{

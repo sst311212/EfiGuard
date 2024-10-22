@@ -162,11 +162,11 @@ HookedLoadImage(
 
 	// Print what's being loaded or booted
 	CONST INT32 OriginalAttribute = SetConsoleTextColour(EFI_GREEN, FALSE);
-	Print(L"[HookedLoadImage] %S %S\r\n    (ParentImageHandle = %llx)\r\n",
-		(IsBoot ? L"Booting" : L"Loading"), ImagePath, (UINTN)ParentImageHandle);
+	// Print(L"[HookedLoadImage] %S %S\r\n    (ParentImageHandle = %llx)\r\n",
+	// 	(IsBoot ? L"Booting" : L"Loading"), ImagePath, (UINTN)ParentImageHandle);
 	if (ImagePath != NULL)
 		FreePool(ImagePath);
-	RtlSleep(500);
+	// RtlSleep(500);
 
 	// Q: If we loaded bootmgfw.efi manually, is there any benefit to flipping BootPolicy to TRUE
 	// to make it look like the load request came straight from the boot manager?
@@ -356,7 +356,7 @@ ExitBootServicesEvent(
 		{
 			SetConsoleTextColour(EFI_GREEN, TRUE);
 			PrintKernelPatchInfo();
-			Print(L"\r\nSuccessfully patched ntoskrnl.exe.\r\n");
+			// Print(L"\r\nSuccessfully patched ntoskrnl.exe.\r\n");
 
 			if (gDriverConfig.WaitForKeyPress)
 			{
@@ -585,9 +585,9 @@ EfiGuardInitialize(
 	// Clear screen and print header
 	//
 	CONST INT32 OriginalAttribute = SetConsoleTextColour(EFI_GREEN, TRUE);
-	Print(L"\r\n\r\n");
-	Print(L"%S", EFIGUARD_TITLE1);
-	Print(L"%S", EFIGUARD_TITLE2);
+	// Print(L"\r\n\r\n");
+	// Print(L"%S", EFIGUARD_TITLE1);
+	// Print(L"%S", EFIGUARD_TITLE2);
 	gST->ConOut->SetAttribute(gST->ConOut, OriginalAttribute);
 
 	EFI_LOADED_IMAGE_PROTOCOL *LocalImageInfo;
@@ -606,13 +606,13 @@ EfiGuardInitialize(
 	// Hook gBS->LoadImage
 	//
 	mOriginalLoadImage = (EFI_IMAGE_LOAD)SetServicePointer(&gBS->Hdr, (VOID**)&gBS->LoadImage, (VOID*)&HookedLoadImage);
-	Print(L"Hooked gBS->LoadImage: 0x%p -> 0x%p\r\n", (VOID*)mOriginalLoadImage, (VOID*)&HookedLoadImage);
+	// Print(L"Hooked gBS->LoadImage: 0x%p -> 0x%p\r\n", (VOID*)mOriginalLoadImage, (VOID*)&HookedLoadImage);
 
 	//
 	// Hook gRT->SetVariable
 	//
 	mOriginalSetVariable = (EFI_SET_VARIABLE)SetServicePointer(&gRT->Hdr, (VOID**)&gRT->SetVariable, (VOID*)&HookedSetVariable);
-	Print(L"Hooked gRT->SetVariable: 0x%p -> 0x%p\r\n", (VOID*)mOriginalSetVariable, (VOID*)&HookedSetVariable);
+	// Print(L"Hooked gRT->SetVariable: 0x%p -> 0x%p\r\n", (VOID*)mOriginalSetVariable, (VOID*)&HookedSetVariable);
 
 	// Register notification callback for ExitBootServices()
 	Status = gBS->CreateEventEx(EVT_NOTIFY_SIGNAL,
@@ -643,7 +643,7 @@ EfiGuardInitialize(
 	gKernelPatchInfo.KernelBase = NULL;
 
 	// The ASCII banner is very pretty - ensure the user has enough time to admire it
-	RtlSleep(1500);
+	// RtlSleep(1500);
 
 Exit:
 	if (EFI_ERROR(Status))

@@ -319,7 +319,7 @@ StartEfiGuard(
 	ASSERT((!EFI_ERROR(Status) || Status == EFI_NOT_FOUND));
 	if (Status == EFI_NOT_FOUND)
 	{
-		Print(L"[LOADER] Locating and loading driver file %S...\r\n", EFIGUARD_DRIVER_FILENAME);
+		// Print(L"[LOADER] Locating and loading driver file %S...\r\n", EFIGUARD_DRIVER_FILENAME);
 		for (UINT32 i = 0; i < ARRAY_SIZE(mDriverPaths); ++i)
 		{
 			Status = LocateFile(mDriverPaths[i], &DriverDevicePath);
@@ -355,7 +355,7 @@ StartEfiGuard(
 	else
 	{
 		ASSERT_EFI_ERROR(Status);
-		Print(L"[LOADER] The driver is already loaded.\r\n");
+		// Print(L"[LOADER] The driver is already loaded.\r\n");
 	}
 
 	Status = gBS->LocateProtocol(&gEfiGuardDriverProtocolGuid,
@@ -515,9 +515,9 @@ TryBootOptionsInOrder(
 		// Print what we're booting
 		if (ConvertedPath != NULL)
 		{
-			Print(L"Booting \"%S\"...\r\n    -> %S = %S\r\n",
-				(BootOptions[Index].Description != NULL ? BootOptions[Index].Description : L"<null description>"),
-				IsLegacy ? L"Legacy path" : L"Path", ConvertedPath);
+			// Print(L"Booting \"%S\"...\r\n    -> %S = %S\r\n",
+			// 	(BootOptions[Index].Description != NULL ? BootOptions[Index].Description : L"<null description>"),
+			// 	IsLegacy ? L"Legacy path" : L"Path", ConvertedPath);
 			FreePool(ConvertedPath);
 		}
 
@@ -683,8 +683,8 @@ UefiMain(
 	//
 	// Allow user to configure the driver by pressing a hotkey
 	//
-	Print(L"Press <HOME> to configure EfiGuard...\r\n");
-	CONST BOOLEAN InteractiveConfiguration = WaitForKeyWithTimeout(1500) == SCAN_HOME;
+	// Print(L"Press <HOME> to configure EfiGuard...\r\n");
+	CONST BOOLEAN InteractiveConfiguration = WaitForKeyWithTimeout(1) == SCAN_HOME;
 
 	//
 	// Locate, load, start and configure the driver

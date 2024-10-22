@@ -59,9 +59,9 @@ PrintLoadedImageInfo(
 	)
 {
 	CHAR16* PathString = ConvertDevicePathToText(ImageInfo->FilePath, TRUE, TRUE);
-	Print(L"\r\n[+] %s\r\n", PathString);
-	Print(L"    -> ImageBase = %llx\r\n", ImageInfo->ImageBase);
-	Print(L"    -> ImageSize = %llx\r\n", ImageInfo->ImageSize);
+	// Print(L"\r\n[+] %s\r\n", PathString);
+	// Print(L"    -> ImageBase = %llx\r\n", ImageInfo->ImageBase);
+	// Print(L"    -> ImageSize = %llx\r\n", ImageInfo->ImageSize);
 	if (PathString != NULL)
 		FreePool(PathString);
 }
